@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="static/vendor/bootstrap/dist/css/bootstrap.css"/>
   <link rel="stylesheet" href="static/css/style.css"/>
   <script src="static/vendor/jquery/dist/jquery.min.js"></script>
+  <script src="static/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
   <script src="static/vendor/jquery.countdown/dist/jquery.countdown.js"></script>
   <script src="static/js/script.js"></script>
 </head>
@@ -15,11 +16,36 @@
   <div class="row">
     <div class="col-lg-3 col-lg-push-3">
       <label for="breakLength"> Break Length </label>
-        <input id="breakLength" type="number" value="0" min="0"/>
+      <input class="form-control" id="breakLength" type="number" value="0" min="0"/>
     </div>
     <div class="col-lg-3 col-lg-push-3">
       <label for="sessionLength"> Session Length </label>
-        <input id="sessionLength" type="number" value="0" min="0"/>
+      <input class="form-control" id="sessionLength" type="number" value="0" min="0"/>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4 well col-lg-push-4 text-center timer">
+      20
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-4 col-lg-push-4 text-center">
+      <button type="button" class="btn btn-primary" id="btn-reset">
+        <i class="glyphicon glyphicon-repeat"></i>
+        Reset countdown
+      </button>
+      <div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-default" id="btn-pause">
+          <input name="options" id="pause" autocomplete="off" type="radio">
+          <i class="glyphicon glyphicon-pause"></i>
+          Pause
+        </label>
+        <label class="btn btn-default" id="btn-resume">
+          <input name="options" id="resume" autocomplete="off" checked="" type="radio">
+          <i class="glyphicon glyphicon-play"></i>
+          Resume
+        </label>
+      </div>
     </div>
   </div>
 </div>
