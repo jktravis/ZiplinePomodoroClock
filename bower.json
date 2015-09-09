@@ -1,0 +1,29 @@
+{
+  "name": "ZiplinePomodoroClock",
+  "version": "0.0.0",
+  "authors": [
+    "jktravis <joshua.travis@gmail.com>"
+  ],
+  "description": "Zipline challange",
+  "main": "index.html",
+  "keywords": [
+    "fcc",
+    "zipline",
+    "pomodoro",
+    "clock"
+  ],
+  "license": "MIT",
+  "homepage": "http://codepen.io/jktravis/pen/rOVdJZ",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "static/vendor",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.5",
+    "jquery.countdown": "~2.1.0"
+  }
+}
