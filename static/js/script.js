@@ -12,7 +12,8 @@ $(document).ready(function ()
         var incrementTime = 70;
         var onBreak = false;
         var currentTime = convertMinToMilli($sessionLength.val());
-        var audio = new Audio('http://www.oringz.com/oringz-uploads/74_bells-message.mp3');
+        var breakTimeAudio = new Audio('http://www.springfieldfiles.com/sounds/homer/hacker.mp3');
+        var workTimeAudio = new Audio('http://www.thanatosrealms.com/war2/sounds/orcs/peon/ready.wav');
 
 
         $(function ()
@@ -80,10 +81,10 @@ $(document).ready(function ()
                 progressBar.attr('aria-valuenow', 0).css('width', '0');
                 SessionTimer.Timer.stop();
 
-                audio.play();
 
                 if (!onBreak)
                 {
+                    breakTimeAudio.play();
                     onBreak = true;
                     currentTime = convertMinToMilli($breakLength.val());
                     SessionTimer.Timer = $.timer(updateTimer, incrementTime, true);
@@ -91,6 +92,7 @@ $(document).ready(function ()
                 }
                 else
                 {
+                    workTimeAudio.play();
                     onBreak = false;
                     currentTime = convertMinToMilli($sessionLength.val());
                     SessionTimer.Timer = $.timer(updateTimer, incrementTime, true);
