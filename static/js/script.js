@@ -1,69 +1,127 @@
 $(document).ready(function ()
 {
-    var today = new Date();
-    // audio downloaded from http://oringz.com/ringtone/soft-bells/
-    var audio = new Audio('https://s3-us-west-2.amazonaws.com/jktravis/74_bells-message.mp3');
-
-    var Pomodoro = {
-        breakLength: 5,
-        sessionLength: 25,
-        setBreak: function (m)
-        {
-            this.breakLength = m;
-        },
-        setSession: function (m)
-        {
-            this.sessionLength = m;
-        }
-    };
-
-    var breakLength = $('#breakLength');
-    var sessionLength = $('#sessionLength');
-
-    var timer = $('.timer');
-
-    breakLength.val(Pomodoro.breakLength);
-    sessionLength.val(Pomodoro.sessionLength);
-
-    breakLength.on('change', function(e)
+    var SessionTimer = new (function ()
     {
-        Pomodoro.setBreak(breakLength.val());
-        console.log(Pomodoro.breakLength);
-    });
+        var $timer = $('.timer');
+        var $sessionLength = $('#sessionLength');
+        var $breakLength = $('#breakLength');
+        var resumeButton = $('#btn-resume');
+        var pauseButton = $('#btn-pause');
+        var incrementTime = 70;
+        var onBreak = false;
+        var currentTime = convertMinToMilli($sessionLength.val());
+        var audio = new Audio('http://www.oringz.com/oringz-uploads/74_bells-message.mp3');
 
-    sessionLength.on('change', function(e)
-    {
-        Pomodoro.setSession(sessionLength.val());
-        console.log(Pomodoro.sessionLength);
-    });
 
-    //today.setMinutes(today.getMinutes() + Pomodoro.sessionLength);
+        $(function ()
+        {
+            SessionTimer.Timer = $.timer(updateTimer, incrementTime, false);
+            $timer.html(formatTime(currentTime));
 
-    timer.countdown(new Date().setMinutes(new Date().getMinutes() + Pomodoro.sessionLength))
-        .on('update.countdown', function (event)
-        {
-            $('.timer').text(event.strftime('%M:%S'));
-        })
-        .on('finish.countdown', function (event)
-        {
-            audio.play();
-        })
-        .on('stop.countdown', function(event)
-        {
-            console.log("stopped");
+            // Setup the timer
+            $sessionLength.on('change', function ()
+            {
+                SessionTimer.resetTimer();
+                $timer.text($sessionLength.val());
+            });
+
+            resumeButton.click(function ()
+            {
+                console.log("playing");
+                SessionTimer.Timer.play();
+            });
+
+            pauseButton.click(function ()
+            {
+                console.log("paused");
+                SessionTimer.Timer.pause();
+            });
+
+            $('#btn-reset').click(function ()
+            {
+                console.log('reset');
+                SessionTimer.resetTimer();
+            })
         });
 
-    //timer.countdown('pause');
+        function updateTimer()
+        {
 
-    $('#pause').on('click', function()
-    {
-        timer.countdown('pause');
+            // Output timer position
+            var timeString = formatTime(currentTime);
+            $timer.html(timeString);
+
+            // If timer is complete, trigger alert
+            if (currentTime == 0)
+            {
+                SessionTimer.Timer.stop();
+                audio.play();
+                if (!onBreak)
+                {
+                    console.log('Break time!');
+                    onBreak = true;
+                    currentTime = convertMinToMilli($breakLength.val());
+                    SessionTimer.Timer = $.timer(updateTimer, incrementTime, true);
+                }
+                else
+                {
+                    console.log('Work work...');
+                    onBreak = false;
+                    currentTime = convertMinToMilli($sessionLength.val());
+                    SessionTimer.Timer = $.timer(updateTimer, incrementTime, true);
+                }
+
+                return;
+            }
+
+            // Increment timer position
+            currentTime -= incrementTime;
+            if (currentTime < 0) currentTime = 0;
+
+        }
+
+        this.resetTimer = function ()
+        {
+
+            resumeButton.removeClass('active');
+            pauseButton.removeClass('active');
+            $timer.text($sessionLength.val());
+
+            // Get time from form
+            var newTime = convertMinToMilli($sessionLength.val());
+            if (newTime > 0)
+            {
+                currentTime = newTime;
+            }
+
+            // Stop and reset timer
+            SessionTimer.Timer.stop().once();
+
+        };
+
     });
-
-    $('#resume').on('click', function()
-    {
-        timer.countdown('resume');
-    });
-
 
 });
+
+// Common functions
+function pad(number, length)
+{
+    var str = '' + number;
+    while (str.length < length)
+    {
+        str = '0' + str;
+    }
+    return str;
+}
+function formatTime(time)
+{
+    time = time / 10;
+    var min = parseInt(time / 6000),
+        sec = parseInt(time / 100) - (min * 60);
+    return (min > 0 ? pad(min, 2) : "00") + ":" + pad(sec, 2);
+}
+
+function convertMinToMilli(mins)
+{// convert minutes to milli-secs
+    return parseInt(mins * 60 * 1000);
+}
