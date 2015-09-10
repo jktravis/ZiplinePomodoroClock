@@ -3,6 +3,8 @@ $(document).ready(function ()
     var SessionTimer = new (function ()
     {
         var $timer = $('.timer');
+        var progress;
+        var progressBar = $('.progress-bar');
         var $sessionLength = $('#sessionLength');
         var $breakLength = $('#breakLength');
         var resumeButton = $('#btn-resume');
@@ -18,28 +20,36 @@ $(document).ready(function ()
             SessionTimer.Timer = $.timer(updateTimer, incrementTime, false);
             $timer.html(formatTime(currentTime));
 
-            // Setup the timer
             $sessionLength.on('change', function ()
             {
-                SessionTimer.resetTimer();
-                $timer.text($sessionLength.val());
+                if (!onBreak)
+                {
+                    SessionTimer.resetTimer();
+                    $timer.text($sessionLength.val());
+                }
+            });
+
+            $breakLength.on('change', function ()
+            {
+                if (onBreak)
+                {
+                    SessionTimer.resetTimer();
+                    $timer.text($breakLength.val());
+                }
             });
 
             resumeButton.click(function ()
             {
-                console.log("playing");
                 SessionTimer.Timer.play();
             });
 
             pauseButton.click(function ()
             {
-                console.log("paused");
                 SessionTimer.Timer.pause();
             });
 
             $('#btn-reset').click(function ()
             {
-                console.log('reset');
                 SessionTimer.resetTimer();
             })
         });
@@ -51,24 +61,40 @@ $(document).ready(function ()
             var timeString = formatTime(currentTime);
             $timer.html(timeString);
 
+
+            if (!onBreak)
+            {
+                progress = getProgressBarValue(currentTime, convertMinToMilli($sessionLength.val()));
+            }
+            else
+            {
+                progress = getProgressBarValue(currentTime, convertMinToMilli($breakLength.val()));
+            }
+
+            progressBar.attr('aria-valuenow', progress).css('width', progress + '%');
+            $('.sr-only').text(progress + '% complete');
+
             // If timer is complete, trigger alert
             if (currentTime == 0)
             {
+                progressBar.attr('aria-valuenow', 0).css('width', '0');
                 SessionTimer.Timer.stop();
+
                 audio.play();
+
                 if (!onBreak)
                 {
-                    console.log('Break time!');
                     onBreak = true;
                     currentTime = convertMinToMilli($breakLength.val());
                     SessionTimer.Timer = $.timer(updateTimer, incrementTime, true);
+                    progressBar.addClass('progress-bar-danger');
                 }
                 else
                 {
-                    console.log('Work work...');
                     onBreak = false;
                     currentTime = convertMinToMilli($sessionLength.val());
                     SessionTimer.Timer = $.timer(updateTimer, incrementTime, true);
+                    progressBar.removeClass('progress-bar-danger');
                 }
 
                 return;
@@ -124,4 +150,10 @@ function formatTime(time)
 function convertMinToMilli(mins)
 {// convert minutes to milli-secs
     return parseInt(mins * 60 * 1000);
+}
+
+function getProgressBarValue(current, total)
+{
+    return (Math.floor(100 - (current / total) * 100));
+
 }
