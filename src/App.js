@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import FaRepeat from 'react-icons/lib/fa/repeat'
 import FaPause from 'react-icons/lib/fa/pause';
 import FaPlay from 'react-icons/lib/fa/play';
-
 import {
   Button,
   Col,
@@ -18,6 +17,7 @@ import {
 } from 'react-bootstrap';
 
 import './App.css';
+import TimeDisplay from './TimeDisplay';
 
 class App extends Component {
   render() {
@@ -43,9 +43,9 @@ class App extends Component {
         <Row>
           <Col lg={4} lgPush={4} sm={5} smPush={3}>
             <Well>
-              <div className="text-center timer">
+              <TimeDisplay>
                 {currentTime}
-              </div>
+              </TimeDisplay>
             </Well>
           </Col>
         </Row>
