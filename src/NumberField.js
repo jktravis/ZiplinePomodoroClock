@@ -28,6 +28,7 @@ function NumberField({labelRef, labelName, value, changeFn}) {
       <FormControl type="number"
                    id={labelRef}
                    min="1"
+                   max="99"
                    value={value}
                    onChange={changeFn}
       />

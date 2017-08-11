@@ -5,9 +5,6 @@ import FaPlay from 'react-icons/lib/fa/play';
 import {
   Button,
   Col,
-  ControlLabel,
-  FormControl,
-  FormGroup,
   Grid,
   ProgressBar,
   Row,
@@ -19,32 +16,73 @@ import {
 import './App.css';
 import TimeDisplay from './TimeDisplay';
 import NumberField from './NumberField';
+import { convertMinToMilli, formatTime } from './utilities';
+
+const defaultState = {
+  currentTime: '25:00',
+  breakLength: 5, // in minutes
+  sessionLength: 25, // in minutes
+  progressPercent: 0,
+  isRunning: 0
+};
 
 class App extends Component {
   constructor() {
     super();
-    this.state = {
-      currentTime: '24:00',
-      breakLength: 5, // in minutes
-      sessionLength: 25 // in minutes
-    }
+    this.state = defaultState;
 
-    this.handleFiledChange = this.handleFiledChange.bind(this);
+    this.handleSessionChange = this.handleSessionChange.bind(this);
+    this.handleBreakChange = this.handleBreakChange.bind(this);
+    this.handlePausePlay = this.handlePausePlay.bind(this);
+    this.handleReset = this.handleReset.bind(this);
   }
 
-  handleFiledChange(event) {
-    this.setState({ [event.target.id]: event.target.value})
+  handleSessionChange(event) {
+    const value = parseInt(event.target.value, 10);
+    const targetBaseName = event.target.id;
+    this.setState({
+      [targetBaseName]: value,
+      currentTime: formatTime(convertMinToMilli(value))
+    });
+  }
+
+  handleBreakChange(event) {
+    const value = parseInt(event.target.value, 10);
+    const targetBaseName = event.target.id;
+    this.setState({
+      [targetBaseName]: value
+    });
+  }
+
+  handleReset() {
+    this.setState(defaultState);
+  }
+
+  handlePausePlay(value) {
+    this.setState({isRunning: value});
+    switch (value) {
+      case 0:
+        // stop the clock
+        console.log('Stop the clock!');
+        break;
+      case 1:
+        // start the clock
+        console.log('Start the clock!');
+        break;
+      default:
+        // do nothing
+    }
   }
 
   render() {
-    const {currentTime, breakLength, sessionLength} = this.state;
+    const {currentTime, breakLength, sessionLength, progressPercent, isRunning} = this.state;
     return (
       <Grid fluid>
         <Row>
           <Col lg={2} lgPush={4} sm={2} smPush={3}>
             <NumberField labelRef="breakLength"
                          labelName="Break Length"
-                         changeFn={this.handleFiledChange}
+                         changeFn={this.handleBreakChange}
                          value={breakLength}
             />
           </Col>
@@ -52,7 +90,7 @@ class App extends Component {
           <Col lg={2} lgPush={4} sm={2} smPush={4}>
             <NumberField labelRef="sessionLength"
                          labelName="Session Length"
-                         changeFn={this.handleFiledChange}
+                         changeFn={this.handleSessionChange}
                          value={sessionLength}
             />
           </Col>
@@ -71,15 +109,19 @@ class App extends Component {
         <Row>
           <Col lg={4} lgPush={4} sm={5} smPush={3}>
             <div className="text-center">
-              <ProgressBar now={50}/>
-              <Button bsStyle="primary">
+              <ProgressBar now={progressPercent}/>
+              <Button bsStyle="primary" onClick={this.handleReset}>
                 <FaRepeat/> Reset Timer
               </Button> {' '}
-              <ToggleButtonGroup type="radio" name="action" defaultValue={2}>
-                <ToggleButton value={2}>
+              <ToggleButtonGroup type="radio"
+                                 name="action"
+                                 defaultValue={isRunning}
+                                 onChange={this.handlePausePlay}
+              >
+                <ToggleButton value={0}>
                   <FaPause/> Pause
                 </ToggleButton>
-                <ToggleButton value={3}>
+                <ToggleButton value={1}>
                   <FaPlay/> Play/Resume
                 </ToggleButton>
               </ToggleButtonGroup>
