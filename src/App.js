@@ -20,8 +20,23 @@ import './App.css';
 import TimeDisplay from './TimeDisplay';
 
 class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      currentTime: '24:00',
+      breakLength: 5, // in minutes
+      sessionLength: 25 // in minutes
+    }
+
+    this.handleFiledChange = this.handleFiledChange.bind(this);
+  }
+
+  handleFiledChange(event) {
+    this.setState({ [event.target.id]: event.target.value})
+  }
+
   render() {
-    const currentTime = "24:00";
+    const {currentTime, breakLength, sessionLength} = this.state;
     return (
       <Grid fluid>
         <Row>
@@ -35,7 +50,13 @@ class App extends Component {
           <Col lg={2} lgPush={4} sm={2} smPush={4}>
             <FormGroup>
               <ControlLabel htmlFor="sessionLength">Session Length</ControlLabel>
-              <FormControl id="sessionLength" type="number" min="1"/>
+              <FormControl id="sessionLength"
+                           type="number"
+                           min="1"
+                           value={sessionLength}
+                           inputRef={ref => this.sessionLength = ref}
+                           onChange={this.handleFiledChange}
+              />
             </FormGroup>
           </Col>
         </Row>
