@@ -18,6 +18,7 @@ import {
 
 import './App.css';
 import TimeDisplay from './TimeDisplay';
+import NumberField from './NumberField';
 
 class App extends Component {
   constructor() {
@@ -41,23 +42,19 @@ class App extends Component {
       <Grid fluid>
         <Row>
           <Col lg={2} lgPush={4} sm={2} smPush={3}>
-            <FormGroup>
-              <ControlLabel htmlFor="breakLength">Break Length</ControlLabel>
-              <FormControl type="number" id="breakLength" min="1"/>
-            </FormGroup>
+            <NumberField labelRef="breakLength"
+                         labelName="Break Length"
+                         changeFn={this.handleFiledChange}
+                         value={breakLength}
+            />
           </Col>
 
           <Col lg={2} lgPush={4} sm={2} smPush={4}>
-            <FormGroup>
-              <ControlLabel htmlFor="sessionLength">Session Length</ControlLabel>
-              <FormControl id="sessionLength"
-                           type="number"
-                           min="1"
-                           value={sessionLength}
-                           inputRef={ref => this.sessionLength = ref}
-                           onChange={this.handleFiledChange}
-              />
-            </FormGroup>
+            <NumberField labelRef="sessionLength"
+                         labelName="Session Length"
+                         changeFn={this.handleFiledChange}
+                         value={sessionLength}
+            />
           </Col>
         </Row>
 
