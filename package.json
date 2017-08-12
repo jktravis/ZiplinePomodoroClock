@@ -2,6 +2,7 @@
   "name": "pomodoro-clock",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://jktravis.github.io/ZiplinePomodoroClock",
   "dependencies": {
     "antd": "^2.12.5",
     "bootstrap": "^3.3.7",
