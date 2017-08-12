@@ -20,11 +20,11 @@ import { convertMinToMilli, formatTime, getProgressBarValue } from './utilities'
 import Timer from './timer';
 
 const defaultState = {
-  currentTimeDisplay: '25:00',
-  currentTimeValue: convertMinToMilli(25),
-  breakLength: 5, // in minutes
+  currentTimeDisplay: '01:00',
+  currentTimeValue: convertMinToMilli(1),
+  breakLength: 1, // in minutes
   onBreak: false,
-  sessionLength: 25, // in minutes
+  sessionLength: 1, // in minutes
   progressPercent: 0,
   isRunning: 0,
   tickStep: 60
@@ -104,21 +104,42 @@ class App extends Component {
     });
   }
 
-  onBreakTick() {
+  onBreakTick(state) {
+    let {currentTimeValue, currentTimeDisplay, progressPercent} = state;
+    const {tickStep, breakLength, sessionLength} = state;
+    const nextState = {};
+    if (currentTimeValue < 60) {
+      nextState.onBreak = false;
+      currentTimeValue = convertMinToMilli(sessionLength);
+      progressPercent = 100;
+      // play sound or do otherwise something
+    } else {
+      currentTimeValue = currentTimeValue - tickStep;
+      progressPercent = getProgressBarValue(currentTimeValue, convertMinToMilli(breakLength));
+    }
+    currentTimeDisplay = formatTime(currentTimeValue);
 
+    nextState.currentTimeValue = currentTimeValue;
+    nextState.currentTimeDisplay = currentTimeDisplay;
+    nextState.progressPercent = 100 - progressPercent;
+
+    return nextState;
   }
 
   workingTick(state) {
     let {currentTimeValue, currentTimeDisplay, progressPercent} = state;
-    const {tickStep, sessionLength} = state;
+    const {tickStep, sessionLength, breakLength} = state;
     const nextState = {};
-    if (currentTimeValue <= 60) {
+    if (currentTimeValue < 60) {
       nextState.onBreak = true;
+      currentTimeValue = convertMinToMilli(breakLength);
+      progressPercent = 100;
       // play sound or do otherwise something
+    } else {
+      currentTimeValue = currentTimeValue - tickStep;
+      progressPercent = getProgressBarValue(currentTimeValue, convertMinToMilli(sessionLength));
     }
-    currentTimeValue = currentTimeValue - tickStep;
     currentTimeDisplay = formatTime(currentTimeValue);
-    progressPercent = getProgressBarValue(currentTimeValue, convertMinToMilli(sessionLength));
 
     nextState.currentTimeValue = currentTimeValue;
     nextState.currentTimeDisplay = currentTimeDisplay;
@@ -128,7 +149,7 @@ class App extends Component {
   }
 
   render() {
-    const {currentTimeDisplay, breakLength, sessionLength, progressPercent, isRunning} = this.state;
+    const {currentTimeDisplay, breakLength, sessionLength, progressPercent, isRunning, onBreak} = this.state;
     return (
       <Grid fluid>
         <Row>
@@ -162,7 +183,10 @@ class App extends Component {
         <Row>
           <Col lg={4} lgPush={4} sm={5} smPush={3}>
             <div className="text-center">
-              <ProgressBar now={progressPercent}/>
+              <ProgressBar now={progressPercent}
+                           label={`${progressPercent}%`}
+                           bsStyle={onBreak ? 'warning' : null }
+              />
               <Button bsStyle="primary" onClick={this.handleReset}>
                 <FaRepeat/> Reset Timer
               </Button> {' '}
