@@ -66,26 +66,32 @@ class App extends Component {
   }
 
   handleReset() {
-    this.setState(defaultState);
+    this.setState(state => {
+      const {timer} = this.state;
+      timer.stop();
+      return defaultState;
+    });
   }
 
   handlePausePlay(value) {
-    const {timer} = this.state;
-    this.setState({isRunning: value});
-    switch (value) {
-      case 0:
-        // pause the clock
-        console.log('Stop the clock!');
-        timer.pause();
-        break;
-      case 1:
-        // start the clock
-        console.log('Start the clock!');
-        timer.play();
-        break;
-      default:
-        // stop the clock
-    }
+    this.setState(state => {
+      const {timer} = this.state;
+      switch (value) {
+        case 0:
+          // pause the clock
+          console.log('Stop the clock!');
+          timer.pause();
+          break;
+        case 1:
+          // start the clock
+          console.log('Start the clock!');
+          timer.play();
+          break;
+        default:
+        // ignore it
+      }
+      return {isRunning: value};
+    });
   }
 
   tick() {
