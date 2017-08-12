@@ -23,6 +23,7 @@ const defaultState = {
   currentTimeDisplay: '25:00',
   currentTimeValue: convertMinToMilli(25),
   breakLength: 5, // in minutes
+  onBreak: false,
   sessionLength: 25, // in minutes
   progressPercent: 0,
   isRunning: 0,
@@ -96,25 +97,34 @@ class App extends Component {
 
   tick() {
     this.setState(state => {
-      let {currentTimeValue, currentTimeDisplay, progressPercent} = state;
-      const {tickStep, sessionLength, timer} = state;
-      const nextState = {};
-
-      if (currentTimeValue <= 60) {
-        timer.stop();
-        nextState.isRunning = 0;
-        // play sound or do otherwise something
+      if (state.onBreak) {
+        return this.onBreakTick(state);
       }
-      currentTimeValue = currentTimeValue - tickStep;
-      currentTimeDisplay = formatTime(currentTimeValue);
-      progressPercent = getProgressBarValue(currentTimeValue, convertMinToMilli(sessionLength));
-
-      nextState.currentTimeValue = currentTimeValue;
-      nextState.currentTimeDisplay = currentTimeDisplay;
-      nextState.progressPercent = progressPercent;
-
-      return nextState;
+      return this.workingTick(state);
     });
+  }
+
+  onBreakTick() {
+
+  }
+
+  workingTick(state) {
+    let {currentTimeValue, currentTimeDisplay, progressPercent} = state;
+    const {tickStep, sessionLength} = state;
+    const nextState = {};
+    if (currentTimeValue <= 60) {
+      nextState.onBreak = true;
+      // play sound or do otherwise something
+    }
+    currentTimeValue = currentTimeValue - tickStep;
+    currentTimeDisplay = formatTime(currentTimeValue);
+    progressPercent = getProgressBarValue(currentTimeValue, convertMinToMilli(sessionLength));
+
+    nextState.currentTimeValue = currentTimeValue;
+    nextState.currentTimeDisplay = currentTimeDisplay;
+    nextState.progressPercent = progressPercent;
+
+    return nextState;
   }
 
   render() {
