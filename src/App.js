@@ -44,6 +44,8 @@ class App extends Component {
       ...defaultState,
       timer: new Timer(this.tick, defaultState.tickStep, false)
     };
+    this.breakTimeAudio = new Audio('http://www.springfieldfiles.com/sounds/homer/hacker.mp3');
+    this.workTimeAudio = new Audio('http://www.thanatosrealms.com/war2/sounds/orcs/peon/ready.wav');
 
   }
 
@@ -105,6 +107,11 @@ class App extends Component {
         currentTimeValue = convertMinToMilli(breakLength);
         progressPercent = 100;
         // play sound or do otherwise something
+        if (nextState.onBreak) {
+          this.breakTimeAudio.play();
+        } else {
+          this.workTimeAudio.play();
+        }
       } else {
         currentTimeValue = currentTimeValue - tickStep;
         progressPercent = getProgressBarValue(currentTimeValue, convertMinToMilli(sessionLength));
