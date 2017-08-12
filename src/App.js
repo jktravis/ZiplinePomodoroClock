@@ -16,33 +16,44 @@ import {
 import './App.css';
 import TimeDisplay from './TimeDisplay';
 import NumberField from './NumberField';
-import { convertMinToMilli, formatTime } from './utilities';
+import { convertMinToMilli, formatTime, getProgressBarValue } from './utilities';
+import Timer from './timer';
 
 const defaultState = {
-  currentTime: '25:00',
+  currentTimeDisplay: '25:00',
+  currentTimeValue: convertMinToMilli(25),
   breakLength: 5, // in minutes
   sessionLength: 25, // in minutes
   progressPercent: 0,
-  isRunning: 0
+  isRunning: 0,
+  tickStep: 60
 };
 
 class App extends Component {
   constructor() {
     super();
-    this.state = defaultState;
 
     this.handleSessionChange = this.handleSessionChange.bind(this);
     this.handleBreakChange = this.handleBreakChange.bind(this);
     this.handlePausePlay = this.handlePausePlay.bind(this);
     this.handleReset = this.handleReset.bind(this);
+    this.tick = this.tick.bind(this);
+
+    this.state = {
+      ...defaultState,
+      timer: new Timer(this.tick, defaultState.tickStep, false)
+    };
+
   }
 
   handleSessionChange(event) {
     const value = parseInt(event.target.value, 10);
     const targetBaseName = event.target.id;
+    const currentTimeValue = convertMinToMilli(value);
     this.setState({
       [targetBaseName]: value,
-      currentTime: formatTime(convertMinToMilli(value))
+      currentTimeDisplay: formatTime(currentTimeValue),
+      currentTimeValue
     });
   }
 
@@ -59,23 +70,49 @@ class App extends Component {
   }
 
   handlePausePlay(value) {
+    const {timer} = this.state;
     this.setState({isRunning: value});
     switch (value) {
       case 0:
-        // stop the clock
+        // pause the clock
         console.log('Stop the clock!');
+        timer.pause();
         break;
       case 1:
         // start the clock
         console.log('Start the clock!');
+        timer.play();
         break;
       default:
-        // do nothing
+        // stop the clock
     }
   }
 
+  tick() {
+    this.setState(state => {
+      let {currentTimeValue, currentTimeDisplay, progressPercent} = state;
+      const {tickStep, sessionLength, timer} = state;
+      const nextState = {};
+
+      if (currentTimeValue <= 60) {
+        timer.stop();
+        nextState.isRunning = 0;
+        // play sound or do otherwise something
+      }
+      currentTimeValue = currentTimeValue - tickStep;
+      currentTimeDisplay = formatTime(currentTimeValue);
+      progressPercent = getProgressBarValue(currentTimeValue, convertMinToMilli(sessionLength));
+
+      nextState.currentTimeValue = currentTimeValue;
+      nextState.currentTimeDisplay = currentTimeDisplay;
+      nextState.progressPercent = progressPercent;
+
+      return nextState;
+    });
+  }
+
   render() {
-    const {currentTime, breakLength, sessionLength, progressPercent, isRunning} = this.state;
+    const {currentTimeDisplay, breakLength, sessionLength, progressPercent, isRunning} = this.state;
     return (
       <Grid fluid>
         <Row>
@@ -100,7 +137,7 @@ class App extends Component {
           <Col lg={4} lgPush={4} sm={5} smPush={3}>
             <Well>
               <TimeDisplay>
-                {currentTime}
+                {currentTimeDisplay}
               </TimeDisplay>
             </Well>
           </Col>
@@ -116,6 +153,7 @@ class App extends Component {
               <ToggleButtonGroup type="radio"
                                  name="action"
                                  defaultValue={isRunning}
+                                 value={isRunning}
                                  onChange={this.handlePausePlay}
               >
                 <ToggleButton value={0}>
