@@ -48,7 +48,7 @@ class App extends Component {
   }
 
   handleSessionChange(event) {
-    const value = parseInt(event.target.value, 10);
+    const value = parseInt(event.target.value, 10) || 0;
     const targetBaseName = event.target.id;
     const currentTimeValue = convertMinToMilli(value);
     this.setState({
@@ -59,7 +59,7 @@ class App extends Component {
   }
 
   handleBreakChange(event) {
-    const value = parseInt(event.target.value, 10);
+    const value = parseInt(event.target.value, 10) || 0;
     const targetBaseName = event.target.id;
     this.setState({
       [targetBaseName]: value
